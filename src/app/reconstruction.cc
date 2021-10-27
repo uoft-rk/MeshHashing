@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
       args.enable_bayesian_update
   );
 
-  gl::Light light;
+  gl::Lighting light;
   light.Load("../config/lights.yaml");
   main_engine.ConfigVisualizingEngine(
       light,

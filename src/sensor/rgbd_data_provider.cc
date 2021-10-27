@@ -65,10 +65,10 @@ bool RGBDDataProvider::ProvideData(
     LOG(ERROR) << "All images provided!";
     return false;
   }
-  depth = cv::imread(depth_image_list[frame_id], CV_LOAD_IMAGE_UNCHANGED);
+  depth = cv::imread(depth_image_list[frame_id], cv::IMREAD_UNCHANGED);
   color = cv::imread(color_image_list[frame_id]);
   if (color.channels() == 3) {
-    cv::cvtColor(color, color, CV_BGR2BGRA);
+    cv::cvtColor(color, color, cv::COLOR_BGR2BGRA);
   }
   ++frame_id;
 
@@ -86,10 +86,10 @@ bool RGBDDataProvider::ProvideData(cv::Mat &depth,
 
   {
     LOG(INFO) << frame_id << "/" << depth_image_list.size();
-    depth = cv::imread(depth_image_list[frame_id], CV_LOAD_IMAGE_UNCHANGED);
+    depth = cv::imread(depth_image_list[frame_id], cv::IMREAD_UNCHANGED);
     color = cv::imread(color_image_list[frame_id]);
     if (color.channels() == 3) {
-      cv::cvtColor(color, color, CV_BGR2BGRA);
+      cv::cvtColor(color, color, cv::COLOR_BGR2BGRA);
     }
 
     wTc = wTcs[0].getInverse() * wTcs[frame_id];

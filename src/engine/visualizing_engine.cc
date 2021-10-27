@@ -2,13 +2,13 @@
 // Created by wei on 17-10-22.
 //
 
-#include <glog/logging.h>
 #include "engine/visualizing_engine.h"
+
+#include <glog/logging.h>
 
 const std::string kShaderPath = "../src/extern/opengl-wrapper/shader";
 
-VisualizingEngine::VisualizingEngine(std::string window_name,
-                                     int width,
+VisualizingEngine::VisualizingEngine(std::string window_name, int width,
                                      int height) {
   Init(window_name, width, height);
 }
@@ -34,8 +34,7 @@ int VisualizingEngine::Render() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   RenderMain();
-  if (enable_bounding_box_ || enable_trajectory_)
-    RenderHelper();
+  if (enable_bounding_box_ || enable_trajectory_) RenderHelper();
 
   window_.swap_buffer();
   if (window_.get_key(GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -44,9 +43,7 @@ int VisualizingEngine::Render() {
   return 0;
 }
 
-void VisualizingEngine::set_interaction_mode(
-    bool enable_interaction
-) {
+void VisualizingEngine::set_interaction_mode(bool enable_interaction) {
   enable_interaction_ = enable_interaction;
   camera_.SwitchInteraction(enable_interaction);
 }
@@ -62,28 +59,21 @@ void VisualizingEngine::set_view_matrix(glm::mat4 view) {
   mvp_ = camera_.projection() * view_ * camera_.model();
 }
 
-void VisualizingEngine::set_light(gl::Light &light) {
-  light_ = light;
-}
-void VisualizingEngine::LoadLight(std::string path) {
-  light_.Load(path);
-}
+void VisualizingEngine::set_light(gl::Lighting& light) { light_ = light; }
+void VisualizingEngine::LoadLight(std::string path) { light_.Load(path); }
 
-void VisualizingEngine::BindMainProgram(
-    uint max_vertices,
-    uint max_triangles,
-    bool enable_global_mesh,
-    bool enable_polygon_mode,
-    bool enable_color
-) {
+void VisualizingEngine::BindMainProgram(uint max_vertices, uint max_triangles,
+                                        bool enable_global_mesh,
+                                        bool enable_polygon_mode,
+                                        bool enable_color) {
   if (!enable_color) {
     main_program_.Load(kShaderPath + "/img_vtx_normal_uni_light_vert.glsl",
                        gl::kVertexShader);
-    main_program_.ReplaceMacro("LIGHT_COUNT", light_.count_str,
+    main_program_.ReplaceMacro("LIGHT_COUNT", light_.light_count_str,
                                gl::kVertexShader);
     main_program_.Load(kShaderPath + "/img_vtx_normal_uni_light_frag.glsl",
                        gl::kFragmentShader);
-    main_program_.ReplaceMacro("LIGHT_COUNT", light_.count_str,
+    main_program_.ReplaceMacro("LIGHT_COUNT", light_.light_count_str,
                                gl::kFragmentShader);
     main_program_.Build();
 
@@ -91,17 +81,13 @@ void VisualizingEngine::BindMainProgram(
     main_uniforms_.GetLocation(main_program_.id(), "view", gl::kMatrix4f);
     main_uniforms_.GetLocation(main_program_.id(), "light", gl::kVector3f);
     main_uniforms_.GetLocation(main_program_.id(), "light_power", gl::kFloat);
-    main_uniforms_.GetLocation(main_program_.id(),
-                               "ambient_coeff",
+    main_uniforms_.GetLocation(main_program_.id(), "ambient_coeff",
                                gl::kVector3f);
-    main_uniforms_.GetLocation(main_program_.id(),
-                               "specular_coeff",
+    main_uniforms_.GetLocation(main_program_.id(), "specular_coeff",
                                gl::kVector3f);
-    main_uniforms_.GetLocation(main_program_.id(),
-                               "diffuse_color",
+    main_uniforms_.GetLocation(main_program_.id(), "diffuse_color",
                                gl::kVector3f);
-    main_uniforms_.GetLocation(main_program_.id(),
-                               "light_color",
+    main_uniforms_.GetLocation(main_program_.id(), "light_color",
                                gl::kVector3f);
 
   } else {
@@ -119,10 +105,9 @@ void VisualizingEngine::BindMainProgram(
                         max_vertices);
   main_args_.InitBuffer(1, {GL_ARRAY_BUFFER, sizeof(float), 3, GL_FLOAT},
                         max_vertices);
-  main_args_.InitBuffer(2,
-                        {GL_ELEMENT_ARRAY_BUFFER, sizeof(int), 3,
-                         GL_UNSIGNED_INT},
-                        max_triangles);
+  main_args_.InitBuffer(
+      2, {GL_ELEMENT_ARRAY_BUFFER, sizeof(int), 3, GL_UNSIGNED_INT},
+      max_triangles);
 
   enable_global_mesh_ = enable_global_mesh;
   enable_polygon_mode_ = enable_polygon_mode;
@@ -135,11 +120,12 @@ void VisualizingEngine::BindMainUniforms() {
   if (!enable_color_) {
     main_uniforms_.Bind("mvp", &mvp_, 1);
     main_uniforms_.Bind("view", &view_, 1);
-    main_uniforms_.Bind("light", light_.positions.data(), light_.count);
-    main_uniforms_.Bind("light_power", &light_.power, 1);
-    main_uniforms_.Bind("ambient_coeff", &light_.ambient_coeff, 1);
-    main_uniforms_.Bind("specular_coeff", &light_.specular_coeff, 1);
-    main_uniforms_.Bind("diffuse_color", &light_.diffuse_color, 1);
+    main_uniforms_.Bind("light", light_.light_positions.data(),
+                        light_.light_count);
+    main_uniforms_.Bind("light_power", &light_.light_power, 1);
+    main_uniforms_.Bind("ambient_coeff", &light_.material_ambient_coeff, 1);
+    main_uniforms_.Bind("specular_coeff", &light_.material_specular_coeff, 1);
+    main_uniforms_.Bind("diffuse_color", &light_.material_diffuse_color, 1);
     main_uniforms_.Bind("light_color", &light_.light_color, 1);
   }
 }
@@ -151,15 +137,12 @@ void VisualizingEngine::BindMainData() {
     main_args_.BindBuffer(1, {GL_ARRAY_BUFFER, sizeof(float), 3, GL_FLOAT},
                           compact_mesh_.vertex_count(), compact_mesh_.colors());
   else
-    main_args_.BindBuffer(1,
-                          {GL_ARRAY_BUFFER, sizeof(float), 3, GL_FLOAT},
+    main_args_.BindBuffer(1, {GL_ARRAY_BUFFER, sizeof(float), 3, GL_FLOAT},
                           compact_mesh_.vertex_count(),
                           compact_mesh_.normals());
-  main_args_.BindBuffer(2,
-                        {GL_ELEMENT_ARRAY_BUFFER, sizeof(int), 3,
-                         GL_UNSIGNED_INT},
-                        compact_mesh_.triangle_count(),
-                        compact_mesh_.triangles());
+  main_args_.BindBuffer(
+      2, {GL_ELEMENT_ARRAY_BUFFER, sizeof(int), 3, GL_UNSIGNED_INT},
+      compact_mesh_.triangle_count(), compact_mesh_.triangles());
 }
 
 void VisualizingEngine::RenderMain() {
@@ -173,10 +156,8 @@ void VisualizingEngine::RenderMain() {
   if (enable_polygon_mode_) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
-  glDrawElements(GL_TRIANGLES,
-                 compact_mesh_.triangle_count() * 3,
-                 GL_UNSIGNED_INT,
-                 0);
+  glDrawElements(GL_TRIANGLES, compact_mesh_.triangle_count() * 3,
+                 GL_UNSIGNED_INT, 0);
 }
 
 void VisualizingEngine::BuildHelperProgram() {
@@ -187,8 +168,7 @@ void VisualizingEngine::BuildHelperProgram() {
   helper_program_.Build();
 
   helper_uniforms_.GetLocation(helper_program_.id(), "mvp", gl::kMatrix4f);
-  helper_uniforms_.GetLocation(helper_program_.id(),
-                               "uni_color",
+  helper_uniforms_.GetLocation(helper_program_.id(), "uni_color",
                                gl::kVector3f);
 }
 
@@ -198,9 +178,7 @@ void VisualizingEngine::BindHelperUniforms() {
   helper_uniforms_.Bind("uni_color", &color, 1);
 }
 
-void VisualizingEngine::InitBoundingBoxData(
-    uint max_vertices
-) {
+void VisualizingEngine::InitBoundingBoxData(uint max_vertices) {
   enable_bounding_box_ = true;
   bounding_box_.Resize(max_vertices);
   box_args_.Init(1, true);
@@ -210,13 +188,10 @@ void VisualizingEngine::InitBoundingBoxData(
 
 void VisualizingEngine::BindBoundingBoxData() {
   box_args_.BindBuffer(0, {GL_ARRAY_BUFFER, sizeof(float), 3, GL_FLOAT},
-                       bounding_box_.vertex_count(),
-                       bounding_box_.vertices());
+                       bounding_box_.vertex_count(), bounding_box_.vertices());
 }
 
-void VisualizingEngine::InitTrajectoryData(
-    uint max_vertices
-) {
+void VisualizingEngine::InitTrajectoryData(uint max_vertices) {
   enable_trajectory_ = true;
   trajectory_.Alloc(max_vertices);
   trajectory_args_.Init(1, true);
@@ -253,22 +228,15 @@ void VisualizingEngine::RenderHelper() {
 }
 
 void VisualizingEngine::BuildRayCaster(
-    const RayCasterParams &ray_caster_params
-) {
+    const RayCasterParams& ray_caster_params) {
   enable_ray_casting_ = true;
   ray_caster_.Alloc(ray_caster_params);
 }
 
-void VisualizingEngine::RenderRayCaster(
-    float4x4 view,
-    BlockArray &blocks,
-    HashTable &hash_table,
-    GeometryHelper &geometry_helper
-) {
-  ray_caster_.Cast(hash_table,
-                   blocks,
-                   ray_caster_.data(),
-                   geometry_helper,
+void VisualizingEngine::RenderRayCaster(float4x4 view, BlockArray& blocks,
+                                        HashTable& hash_table,
+                                        GeometryHelper& geometry_helper) {
+  ray_caster_.Cast(hash_table, blocks, ray_caster_.data(), geometry_helper,
                    view);
   cv::imshow("RayCasting", ray_caster_.surface_image());
   cv::waitKey(1);

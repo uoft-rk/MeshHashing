@@ -39,7 +39,7 @@ LoggingEngine::~LoggingEngine() {
 void LoggingEngine::ConfigVideoWriter(int width, int height) {
   enable_video_ = true;
   video_writer_.open(base_path_ + "/video.avi",
-                     CV_FOURCC('X', 'V', 'I', 'D'),
+                     cv::VideoWriter::fourcc('X', 'V', 'I', 'D'),
                      30, cv::Size(width, height));
 }
 

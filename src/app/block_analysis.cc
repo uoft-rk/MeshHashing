@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
   LOG(INFO) << "Block info loaded";
 
   gl::Window window("BlockAnalysis", 640, 480);
-  gl::Camera camera(window.visual_width(), window.visual_height());
+  gl::Camera camera(window.width(), window.height());
   camera.SwitchInteraction(true);
   glm::mat4 model = glm::mat4(1.0);
   model[1][1] = -1;

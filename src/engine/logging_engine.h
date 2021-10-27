@@ -9,6 +9,10 @@
 #include <string>
 #include <opencv2/opencv.hpp>
 
+#include "core/block.h"
+#include "core/hash_entry.h"
+#include "visualization/compact_mesh.h"
+
 class Int3Sort {
 public:
   bool operator()(int3 const &a, int3 const &b) const {

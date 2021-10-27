@@ -29,7 +29,7 @@ public:
     return window_.CaptureRGB();
   }
   // Call set_lights before this
-  void set_light(gl::Light& light);
+  void set_light(gl::Lighting& light);
   void LoadLight(std::string path);
   void BindMainProgram(
       uint max_vertices,
@@ -103,7 +103,7 @@ private:
   bool enable_color_ = false;
 
   // Lighting conditions
-  gl::Light light_;
+  gl::Lighting light_;
 
   // Shared viewpoint
   glm::mat4  mvp_;

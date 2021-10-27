@@ -38,7 +38,7 @@ public:
 
   void ConfigLocalizingEngine();
   void ConfigVisualizingEngine(
-      gl::Light& light,
+      gl::Lighting& light,
       bool enable_navigation,
       bool enable_global_mesh,
       bool enable_bounding_box,

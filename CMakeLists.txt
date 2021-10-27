@@ -85,6 +85,7 @@ INCLUDE_DIRECTORIES(
         ${GL_WRAPPER}/include
         ${EIGEN3_INCLUDE_DIR}
         ${GLOG_INCLUDE_DIRS}
+        /usr/include/opencv4
         ${CUDA_TOOLKIT_INCLUDE})
 
 #----------
