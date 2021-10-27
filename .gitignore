@@ -31,10 +31,14 @@
 *.out
 *.app
 
+# Logs
+*.log
+
 # CLion
 cmake-build-release/
 cmake-build-debug/
 bin/
+build/
 lib/
 .idea/
 result/

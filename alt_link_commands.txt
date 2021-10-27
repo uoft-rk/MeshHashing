@@ -1,0 +1,13 @@
+-lopencv_imgcodecs -lopencv_videoio -lopencv_calib3d -lfmt
+
+
+/usr/bin/c++   -std=c++11   CMakeFiles/block_analysis.dir/src/app/block_analysis.cc.o  -o ../bin/block_analysis  libgl-util.a libmesh-hashing.a -lopencv_core -lopencv_highgui /usr/lib/x86_64-linux-gnu/libglog.so libgl-util.a /usr/lib/x86_64-linux-gnu/libGL.so /usr/lib/x86_64-linux-gnu/libGLU.so /usr/lib/x86_64-linux-gnu/libGLEW.so -lglfw -lrt -lm libmesh-hashing-cuda.a /usr/lib/x86_64-linux-gnu/libcudart_static.a -lpthread -ldl /usr/lib/x86_64-linux-gnu/librt.so /usr/lib/x86_64-linux-gnu/libcudart.so /usr/lib/x86_64-linux-gnu/libcuda.so -lopencv_core -lopencv_highgui /usr/lib/x86_64-linux-gnu/libglog.so -lopencv_imgproc  -lopencv_imgcodecs -lopencv_videoio -lopencv_calib3d -lfmt
+
+
+/usr/bin/c++   -std=c++11   CMakeFiles/slam.dir/src/app/slam.cc.o  -o ../bin/slam  libmesh-hashing.a -lopencv_core -lopencv_highgui /usr/lib/x86_64-linux-gnu/libglog.so libmesh-hashing-cuda.a /usr/lib/x86_64-linux-gnu/libcudart_static.a -lpthread /usr/lib/x86_64-linux-gnu/librt.so /usr/lib/x86_64-linux-gnu/libcudart.so /usr/lib/x86_64-linux-gnu/libcuda.so -lopencv_core -lopencv_highgui -lopencv_imgproc libgl-util.a /usr/lib/x86_64-linux-gnu/libGL.so /usr/lib/x86_64-linux-gnu/libGLU.so /usr/lib/x86_64-linux-gnu/libGLEW.so -lglfw -lrt -lm -ldl /usr/lib/x86_64-linux-gnu/libglog.so -lopencv_imgcodecs -lopencv_videoio -lopencv_calib3d -lfmt
+
+
+/usr/bin/c++   -std=c++11   CMakeFiles/reconstruction.dir/src/app/reconstruction.cc.o  -o ../bin/reconstruction  libmesh-hashing.a -lopencv_core -lopencv_highgui /usr/lib/x86_64-linux-gnu/libglog.so libmesh-hashing-cuda.a /usr/lib/x86_64-linux-gnu/libcudart_static.a -lpthread /usr/lib/x86_64-linux-gnu/librt.so /usr/lib/x86_64-linux-gnu/libcudart.so /usr/lib/x86_64-linux-gnu/libcuda.so -lopencv_core -lopencv_highgui -lopencv_imgproc libgl-util.a /usr/lib/x86_64-linux-gnu/libGL.so /usr/lib/x86_64-linux-gnu/libGLU.so /usr/lib/x86_64-linux-gnu/libGLEW.so -lglfw -lrt -lm -ldl /usr/lib/x86_64-linux-gnu/libglog.so -lopencv_imgcodecs -lopencv_videoio -lopencv_calib3d -lfmt
+
+
+/usr/local/cuda-11.0/bin/nvcc CMakeFiles/slam.dir/src/app/slam.cc.o  -o ../bin/slam  libmesh-hashing.a -lopencv_core -lopencv_highgui /usr/lib/x86_64-linux-gnu/libglog.so libmesh-hashing-cuda.a -lpthread /usr/lib/x86_64-linux-gnu/librt.so /usr/lib/x86_64-linux-gnu/libcuda.so -lopencv_core -lopencv_highgui -lopencv_imgproc libgl-util.a /usr/lib/x86_64-linux-gnu/libGL.so /usr/lib/x86_64-linux-gnu/libGLU.so /usr/lib/x86_64-linux-gnu/libGLEW.so -lglfw -lrt -lm -ldl /usr/lib/x86_64-linux-gnu/libglog.so -lopencv_imgcodecs -lopencv_videoio -lopencv_calib3d -lfmt --cudart=shared

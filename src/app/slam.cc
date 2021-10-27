@@ -63,16 +63,16 @@ int main(int argc, char **argv) {
 
   gl::Lighting light;
   light.Load("../config/lights.yaml");
-  main_engine.ConfigVisualizingEngine(
-      light,
-      args.enable_navigation,
-      args.enable_global_mesh,
-      args.enable_bounding_box,
-      args.enable_trajectory,
-      args.enable_polygon_mode,
-      args.enable_ray_casting,
-      args.enable_color
-  );
+  // main_engine.ConfigVisualizingEngine(
+  //     light,
+  //     args.enable_navigation,
+  //     args.enable_global_mesh,
+  //     args.enable_bounding_box,
+  //     args.enable_trajectory,
+  //     args.enable_polygon_mode,
+  //     args.enable_ray_casting,
+  //     args.enable_color
+  // );
   main_engine.ConfigLoggingEngine(
       ".",
       args.enable_video_recording,
@@ -100,15 +100,15 @@ int main(int argc, char **argv) {
     main_engine.Meshing();
 
     cTw = sensor.cTw();
-    if (main_engine.Visualize(cTw))
-      break;
+    // if (main_engine.Visualize(cTw))
+    //   break;
 
-    main_engine.Log();
+    // main_engine.Log();
     //main_engine.RecordBlocks();
     main_engine.Recycle();
   }
 
-  main_engine.FinalLog();
+  // main_engine.FinalLog();
 
   return 0;
 }
