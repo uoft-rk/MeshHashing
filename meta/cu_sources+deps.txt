@@ -1,0 +1,22 @@
+../../src/optimize/primal_dual.cu
+../../src/core/block_array.cu
+../../src/core/hash_table.cu
+../../src/visualization/compact_mesh.cu
+../../src/core/mesh.cu
+../../src/visualization/extract_bounding_box.cu
+../../src/mapping/recycle.cu
+../../src/visualization/bounding_box.cu
+../../src/visualization/compress_mesh.cu
+../../src/core/entry_array.cu
+../../src/visualization/trajectory.cu
+../../src/sensor/preprocess.cu -I/usr/include/opencv4
+../../src/visualization/colorize.cu -I/usr/include/opencv4
+../../src/localizing/point_to_psdf.cu -I/usr/include/opencv4 -I/usr/include/eigen3
+../../src/mapping/allocate.cu -I/usr/include/opencv4 -I/usr/include/eigen3
+../../src/optimize/linear_equations.cu -I/usr/include/opencv4 -I/usr/include/eigen3
+../../src/visualization/ray_caster.cu -I/usr/include/opencv4 -I/usr/include/eigen3
+../../src/sensor/rgbd_sensor.cu -I/usr/include/opencv4 -I/usr/include/eigen3
+../../src/meshing/marching_cubes.cu -I/usr/include/opencv4 -I/usr/include/eigen3
+../../src/mapping/update_bayesian.cu -I/usr/include/opencv4 -I/usr/include/eigen3
+../../src/core/collect_block_array.cu -I/usr/include/opencv4 -I/usr/include/eigen3
+../../src/mapping/update_simple.cu -I/usr/include/opencv4 -I/usr/include/eigen3

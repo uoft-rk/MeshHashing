@@ -10,12 +10,100 @@
 /usr/bin/c++   -std=c++11   CMakeFiles/reconstruction.dir/src/app/reconstruction.cc.o  -o ../bin/reconstruction  libmesh-hashing.a -lopencv_core -lopencv_highgui /usr/lib/x86_64-linux-gnu/libglog.so libmesh-hashing-cuda.a /usr/lib/x86_64-linux-gnu/libcudart_static.a -lpthread /usr/lib/x86_64-linux-gnu/librt.so /usr/lib/x86_64-linux-gnu/libcudart.so /usr/lib/x86_64-linux-gnu/libcuda.so -lopencv_core -lopencv_highgui -lopencv_imgproc libgl-util.a /usr/lib/x86_64-linux-gnu/libGL.so /usr/lib/x86_64-linux-gnu/libGLU.so /usr/lib/x86_64-linux-gnu/libGLEW.so -lglfw -lrt -lm -ldl /usr/lib/x86_64-linux-gnu/libglog.so -lopencv_imgcodecs -lopencv_videoio -lopencv_calib3d -lfmt
 
 
+
+
+/usr/bin/ar qc ./libmesh-hashing-cuda.a \
+./primal_dual.o \
+./block_array.o \
+./hash_table.o \
+./compact_mesh.o \
+./mesh.o \
+./extract_bounding_box.o \
+./recycle.o \
+./bounding_box.o \
+./compress_mesh.o \
+./entry_array.o \
+./trajectory.o \
+./preprocess.o \
+./colorize.o \
+./point_to_psdf.o \
+./allocate.o \
+./linear_equations.o \
+./ray_caster.o \
+./rgbd_sensor.o \
+./marching_cubes.o \
+./update_bayesian.o \
+./collect_block_array.o \
+./update_simple.o
+
+
+
+
+
 /usr/local/cuda-11.0/bin/nvcc \
-CMakeFiles/slam.dir/src/app/slam.cc.o \
--o ../bin/slam \
-libmesh-hashing.a \
-libmesh-hashing-cuda.a \
-/usr/lib/x86_64-linux-gnu/libcuda.so \
+-c \
+-I/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src \
+-I/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/extern/cuda \
+../../src/optimize/primal_dual.cu \
+../../src/core/block_array.cu \
+../../src/core/hash_table.cu \
+../../src/visualization/compact_mesh.cu \
+../../src/core/mesh.cu \
+../../src/visualization/extract_bounding_box.cu \
+../../src/mapping/recycle.cu \
+../../src/visualization/bounding_box.cu \
+../../src/visualization/compress_mesh.cu \
+../../src/core/entry_array.cu \
+../../src/visualization/trajectory.cu \
+../../src/sensor/preprocess.cu -I/usr/include/opencv4 \
+../../src/visualization/colorize.cu -I/usr/include/opencv4 \
+../../src/localizing/point_to_psdf.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+../../src/mapping/allocate.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+../../src/optimize/linear_equations.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+../../src/visualization/ray_caster.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+../../src/sensor/rgbd_sensor.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+../../src/meshing/marching_cubes.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+../../src/mapping/update_bayesian.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+../../src/core/collect_block_array.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+../../src/mapping/update_simple.cu -I/usr/include/opencv4 -I/usr/include/eigen3 
+
+
+
+
+
+
+
+
+
+
+/usr/local/cuda-11.0/bin/nvcc \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/build/CMakeFiles/slam.dir/src/app/slam.cc.o \
+-o ./slam \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/build/libmesh-hashing.a \
+-I/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src \
+-I/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/extern/cuda \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/optimize/primal_dual.cu \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/core/block_array.cu \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/core/hash_table.cu \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/visualization/compact_mesh.cu \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/core/mesh.cu \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/visualization/extract_bounding_box.cu \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/mapping/recycle.cu \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/visualization/bounding_box.cu \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/visualization/compress_mesh.cu \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/core/entry_array.cu \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/visualization/trajectory.cu \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/sensor/preprocess.cu -I/usr/include/opencv4 \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/visualization/colorize.cu -I/usr/include/opencv4 \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/localizing/point_to_psdf.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/mapping/allocate.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/optimize/linear_equations.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/visualization/ray_caster.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/sensor/rgbd_sensor.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/meshing/marching_cubes.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/mapping/update_bayesian.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/core/collect_block_array.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
+/home/r.kigaru/slam_robotics/slam_impls/mesh_hashing/src/mapping/update_simple.cu -I/usr/include/opencv4 -I/usr/include/eigen3 \
 /usr/lib/x86_64-linux-gnu/libglog.so \
 /usr/lib/x86_64-linux-gnu/librt.so \
 -ldl \
@@ -25,3 +113,9 @@ libmesh-hashing-cuda.a \
 -lpthread \
 -lrt \
 --cudart shared
+
+
+
+
+
+/usr/lib/x86_64-linux-gnu/libcuda.so \
