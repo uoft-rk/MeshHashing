@@ -19,10 +19,6 @@ LIST(APPEND
         CMAKE_MODULE_PATH
         ${PROJECT_SOURCE_DIR}/cmake_modules)
 
-# Graphics dependent
-FIND_PACKAGE(GLFW3  REQUIRED)
-FIND_PACKAGE(GLEW   REQUIRED)
-FIND_PACKAGE(OpenGL REQUIRED)
 # CV utilities
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(Eigen3 REQUIRED)
@@ -44,18 +40,6 @@ endforeach()
 
 #----------
 ## Found Libs
-SET(OPENGL_DEPENDENCIES "")
-LIST(APPEND
-        OPENGL_DEPENDENCIES
-        ${OPENGL_LIBRARY}
-        ${GLEW_LIBRARY})
-if (APPLE)
-    LIST(APPEND OPENGL_DEPENDENCIES
-            ${GLFW3_LIBRARIES})
-else ()
-    LIST(APPEND OPENGL_DEPENDENCIES
-            ${GLFW3_STATIC_LIBRARIES})
-endif()
 
 SET(CUDA_DEPENDENCIES "")
 LIST(APPEND
@@ -64,9 +48,6 @@ LIST(APPEND
         ${CUDA_CUDA_LIBRARY})
 
 MESSAGE(STATUS "Found libraries:")
-foreach(library ${OPENGL_DEPENDENCIES})
-    MESSAGE(STATUS ${library})
-endforeach()
 foreach(library ${CUDA_DEPENDENCIES})
     MESSAGE(STATUS ${library})
 endforeach()
@@ -77,12 +58,10 @@ endforeach()
 
 #----------
 SET(VH ${PROJECT_SOURCE_DIR}/src)
-SET(GL_WRAPPER ${VH}/extern/opengl-wrapper)
 
 INCLUDE_DIRECTORIES(
         ${VH}
         ${VH}/extern/cuda
-        ${GL_WRAPPER}/include
         ${EIGEN3_INCLUDE_DIR}
         ${GLOG_INCLUDE_DIRS}
         /usr/include/opencv4
@@ -91,18 +70,6 @@ INCLUDE_DIRECTORIES(
 #----------
 ## Building Libraries
 ### 1. OpenGL util
-ADD_LIBRARY(gl-util
-        ${GL_WRAPPER}/src/core/args.cc
-        ${GL_WRAPPER}/src/core/program.cc
-        ${GL_WRAPPER}/src/core/window.cc
-        ${GL_WRAPPER}/src/core/uniforms.cc
-        ${GL_WRAPPER}/src/core/camera.cc)
-SET_TARGET_PROPERTIES(gl-util
-        PROPERTIES
-        COMPILE_DEFINITIONS USE_CUDA_GL)
-TARGET_LINK_LIBRARIES(gl-util
-        ${OPENGL_DEPENDENCIES}
-        ${GLOG_LIBRARIES})
 
 ### 2. CUDA
 # Don't know exactly how it should be configured
@@ -139,7 +106,7 @@ CUDA_ADD_LIBRARY(mesh-hashing-cuda
 TARGET_LINK_LIBRARIES(mesh-hashing-cuda
         ${CUDA_DEPENDENCIES}
         ${GLOG_LIBRARIES}
-        -lopencv_core -lopencv_highgui -lopencv_imgproc)
+        -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_calib3d)
 
 ### 3. C++
 ADD_LIBRARY(mesh-hashing
@@ -153,42 +120,28 @@ ADD_LIBRARY(mesh-hashing
 
         ${VH}/sensor/rgbd_data_provider.cc)
         #${VH}/tool/cpp/debugger.cc)
-SET_TARGET_PROPERTIES(mesh-hashing
-        PROPERTIES
-        COMPILE_DEFINITIONS USE_CUDA_GL)
 TARGET_LINK_LIBRARIES(mesh-hashing
-        mesh-hashing-cuda
-        gl-util)
+        mesh-hashing-cuda)
 
 #----------
 ### Loop over
 MESSAGE(STATUS ${GLOG_LIBRARIES})
 ADD_EXECUTABLE(reconstruction src/app/reconstruction.cc)
-SET_TARGET_PROPERTIES(reconstruction
-        PROPERTIES
-        COMPILE_DEFINITIONS USE_CUDA_GL)
 TARGET_LINK_LIBRARIES(reconstruction
         mesh-hashing
-        -lopencv_core -lopencv_highgui
+        -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_calib3d
         ${GLOG_LIBRARIES})
 
 ADD_EXECUTABLE(slam src/app/slam.cc)
-SET_TARGET_PROPERTIES(slam
-        PROPERTIES
-        COMPILE_DEFINITIONS USE_CUDA_GL)
 TARGET_LINK_LIBRARIES(slam
         mesh-hashing
-        -lopencv_core -lopencv_highgui
+        -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_calib3d
         ${GLOG_LIBRARIES})
 
 ADD_EXECUTABLE(block_analysis src/app/block_analysis.cc)
-SET_TARGET_PROPERTIES(block_analysis
-        PROPERTIES
-        COMPILE_DEFINITIONS USE_CUDA_GL)
 TARGET_LINK_LIBRARIES(block_analysis
-        gl-util
         mesh-hashing
-        -lopencv_core -lopencv_highgui
+        -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_calib3d
         ${GLOG_LIBRARIES})
 
 ### An ORB app

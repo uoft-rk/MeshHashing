@@ -29,7 +29,7 @@
 
 #include "io/config_manager.h"
 #include "core/collect_block_array.h"
-#include "glwrapper.h"
+// #include "glwrapper.h"
 
 #include <sophus/se3.hpp>
 #define DEBUG_
@@ -61,8 +61,8 @@ int main(int argc, char **argv) {
       args.enable_bayesian_update
   );
 
-  gl::Lighting light;
-  light.Load("../config/lights.yaml");
+  // gl::Lighting light;
+  // light.Load("../config/lights.yaml");
   // main_engine.ConfigVisualizingEngine(
   //     light,
   //     args.enable_navigation,

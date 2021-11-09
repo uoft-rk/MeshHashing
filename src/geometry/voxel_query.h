@@ -90,10 +90,31 @@ inline bool GetVoxelValue(
     uint i = geometry_helper.VectorizeOffset(offset);
     *voxel = blocks[curr_entry.ptr].voxels[i];
   } else {
-    HashEntry entry = hash_table.GetEntry(block_pos);
-    if (entry.ptr == FREE_ENTRY) return false;
+  int entry_ptr = 0;
+#ifdef __CUDA_ARCH__
+  asm volatile("mad24.lo.s32 %0, %1, %2, %3;"
+               : "=r"(entry_ptr)
+               : "r"(block_pos.x),
+                 "r"(block_pos.y),
+                 "r"(block_pos.z));
+
+  bool cache_miss;
+  if (cache_miss = (entry_ptr == 0))
+#endif
+    entry_ptr = hash_table.GetEntry(block_pos).ptr;
+    
+    if (entry_ptr == FREE_ENTRY) return false;
     uint i = geometry_helper.VectorizeOffset(offset);
-    *voxel = blocks[entry.ptr].voxels[i];
+    *voxel = blocks[entry_ptr].voxels[i];
+#ifdef __CUDA_ARCH__
+  if (cache_miss)
+    asm volatile("bfi.b32 %0, %1, %2, %3, %4;"
+                 : "=r"(entry_ptr)
+                 : "r"(block_pos.x),
+                   "r"(block_pos.y),
+                   "r"(block_pos.z),
+                   "r"(entry_ptr));
+#endif
   }
   return true;
 }
@@ -110,20 +131,54 @@ inline bool GetVoxelValue(
   int3 block_pos = geometry_helper.VoxelToBlock(voxel_pos);
   uint3 offset = geometry_helper.VoxelToOffset(block_pos, voxel_pos);
 
-  HashEntry entry = hash_table.GetEntry(block_pos);
-  if (entry.ptr == FREE_ENTRY) {
+  int entry_ptr = 0;
+#ifdef __CUDA_ARCH__
+  asm volatile("mad24.lo.s32 %0, %1, %2, %3;"
+               : "=r"(entry_ptr)
+               : "r"(block_pos.x),
+                 "r"(block_pos.y),
+                 "r"(block_pos.z));
+
+  bool cache_miss;
+  if (cache_miss = (entry_ptr == 0))
+#endif
+    entry_ptr = hash_table.GetEntry(block_pos).ptr;
+
+  if (entry_ptr == FREE_ENTRY) {
     voxel->sdf = 0;
     voxel->inv_sigma2 = 0;
     voxel->color = make_uchar3(0,0,0);
+
+#ifdef __CUDA_ARCH__
+  if (cache_miss)
+    asm volatile("bfi.b32 %0, %1, %2, %3, %4;"
+                 : "=r"(entry_ptr)
+                 : "r"(block_pos.x),
+                   "r"(block_pos.y),
+                   "r"(block_pos.z),
+                   "r"(entry_ptr));
+#endif
+
     return false;
   } else {
     uint i = geometry_helper.VectorizeOffset(offset);
-    const Voxel& v = blocks[entry.ptr].voxels[i];
+    const Voxel& v = blocks[entry_ptr].voxels[i];
     voxel->sdf = v.sdf;
     voxel->inv_sigma2 = v.inv_sigma2;
     voxel->color = v.color;
     voxel->a = v.a;
     voxel->b = v.b;
+
+#ifdef __CUDA_ARCH__
+  if (cache_miss)
+    asm volatile("bfi.b32 %0, %1, %2, %3, %4;"
+                 : "=r"(entry_ptr)
+                 : "r"(block_pos.x),
+                   "r"(block_pos.y),
+                   "r"(block_pos.z),
+                   "r"(entry_ptr));
+#endif
+
     return true;
   }
 }

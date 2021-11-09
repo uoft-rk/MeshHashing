@@ -44,7 +44,7 @@ Sensor::Sensor(SensorParams &sensor_params) {
   data_.color_texture = 0;
   data_.normal_texture = 0;
 
-  BindCUDATexture();
+  // BindCUDATexture();
   is_allocated_on_gpu_ = true;
 }
 
@@ -75,12 +75,12 @@ void Sensor::BindCUDATexture() {
   memset(&depth_tex_desc, 0, sizeof(depth_tex_desc));
   depth_tex_desc.readMode = cudaReadModeElementType;
 
-  if (data_.depth_texture != 0)
-    checkCudaErrors(cudaDestroyTextureObject(data_.depth_texture));
-  checkCudaErrors(cudaCreateTextureObject(&data_.depth_texture,
-                                          &depth_resource,
-                                          &depth_tex_desc,
-                                          NULL));
+  // if (data_.depth_texture != 0)
+  //   checkCudaErrors(cudaDestroyTextureObject(data_.depth_texture));
+  // checkCudaErrors(cudaCreateTextureObject(&data_.depth_texture,
+  //                                         &depth_resource,
+  //                                         &depth_tex_desc,
+  //                                         NULL));
 
   cudaResourceDesc color_resource;
   memset(&color_resource, 0, sizeof(color_resource));
@@ -91,12 +91,12 @@ void Sensor::BindCUDATexture() {
   memset(&color_tex_desc, 0, sizeof(color_tex_desc));
   color_tex_desc.readMode = cudaReadModeElementType;
 
-  if (data_.color_texture != 0)
-    checkCudaErrors(cudaDestroyTextureObject(data_.color_texture));
-  checkCudaErrors(cudaCreateTextureObject(&data_.color_texture,
-                                          &color_resource,
-                                          &color_tex_desc,
-                                          NULL));
+  // if (data_.color_texture != 0)
+  //   checkCudaErrors(cudaDestroyTextureObject(data_.color_texture));
+  // checkCudaErrors(cudaCreateTextureObject(&data_.color_texture,
+  //                                         &color_resource,
+  //                                         &color_tex_desc,
+  //                                         NULL));
 
   cudaResourceDesc normal_resource;
   memset(&normal_resource, 0, sizeof(normal_resource));
@@ -107,12 +107,12 @@ void Sensor::BindCUDATexture() {
   memset(&normal_tex_desc, 0, sizeof(normal_tex_desc));
   normal_tex_desc.readMode = cudaReadModeElementType;
 
-  if (data_.normal_texture != 0)
-    checkCudaErrors(cudaDestroyTextureObject(data_.normal_texture));
-  checkCudaErrors(cudaCreateTextureObject(&data_.normal_texture,
-                                          &normal_resource,
-                                          &normal_tex_desc,
-                                          NULL));
+  // if (data_.normal_texture != 0)
+  //   checkCudaErrors(cudaDestroyTextureObject(data_.normal_texture));
+  // checkCudaErrors(cudaCreateTextureObject(&data_.normal_texture,
+  //                                         &normal_resource,
+  //                                         &normal_tex_desc,
+  //                                         NULL));
 }
 
 int Sensor::Process(cv::Mat &depth, cv::Mat &color) {
@@ -132,7 +132,7 @@ int Sensor::Process(cv::Mat &depth, cv::Mat &color) {
                                     data_.color_data,
                                     sizeof(float4)*params_.height*params_.width,
                                     cudaMemcpyDeviceToDevice));
-  BindCUDATexture();
+  // BindCUDATexture();
   return 0;
 }
 

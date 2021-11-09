@@ -192,124 +192,124 @@ void MainEngine::Recycle() {
 }
 
 // view: world -> camera
-int MainEngine::Visualize(float4x4 view, float4x4 view_gt) {
-  if (vis_engine_.enable_interaction()) {
-    vis_engine_.update_view_matrix();
-  } else {
-    glm::mat4 glm_view;
-    for (int i = 0; i < 4; ++i)
-      for (int j = 0; j < 4; ++j)
-        glm_view[i][j] = view.entries2[i][j];
-    glm_view = glm::transpose(glm_view);
-    vis_engine_.set_view_matrix(glm_view);
-  }
+// int MainEngine::Visualize(float4x4 view, float4x4 view_gt) {
+//   if (vis_engine_.enable_interaction()) {
+//     vis_engine_.update_view_matrix();
+//   } else {
+//     // glm::mat4 glm_view;
+//     // for (int i = 0; i < 4; ++i)
+//     //   for (int j = 0; j < 4; ++j)
+//     //     glm_view[i][j] = view.entries2[i][j];
+//     // glm_view = glm::transpose(glm_view);
+//     // vis_engine_.set_view_matrix(glm_view);
+//   }
 
-  if (vis_engine_.enable_global_mesh()) {
-    CollectAllBlocks(hash_table_, candidate_entries_);
-  } // else CollectBlocksInFrustum
+//   if (vis_engine_.enable_global_mesh()) {
+//     CollectAllBlocks(hash_table_, candidate_entries_);
+//   } // else CollectBlocksInFrustum
 
-  int3 timing;
-  CompressMesh(candidate_entries_,
-               blocks_,
-               mesh_,
-               vis_engine_.compact_mesh(),
-               timing);
+//   int3 timing;
+//   CompressMesh(candidate_entries_,
+//                blocks_,
+//                mesh_,
+//                vis_engine_.compact_mesh(),
+//                timing);
 
-  if (vis_engine_.enable_bounding_box()) {
-    vis_engine_.bounding_box().Reset();
+//   if (vis_engine_.enable_bounding_box()) {
+//     vis_engine_.bounding_box().Reset();
 
-    ExtractBoundingBox(candidate_entries_,
-                       vis_engine_.bounding_box(),
-                       geometry_helper_);
-  }
-  if (vis_engine_.enable_trajectory()) {
-    vis_engine_.trajectory().AddPose(view.getInverse());
-    vis_engine_.trajectory().AddPose(view_gt.getInverse());
-  }
-
-
-  if (vis_engine_.enable_ray_casting()) {
-    Timer timer;
-    timer.Tick();
-    vis_engine_.RenderRayCaster(view,
-                                blocks_,
-                                hash_table_,
-                                geometry_helper_);
-    LOG(INFO) << " Raycasting time: " << timer.Tock();
-  }
-
-  return  vis_engine_.Render();
-}
-
-int MainEngine::Visualize(float4x4 view) {
-  if (vis_engine_.enable_interaction()) {
-    vis_engine_.update_view_matrix();
-  } else {
-    glm::mat4 glm_view;
-    for (int i = 0; i < 4; ++i)
-      for (int j = 0; j < 4; ++j)
-        glm_view[i][j] = view.entries2[i][j];
-    glm_view = glm::transpose(glm_view);
-    vis_engine_.set_view_matrix(glm_view);
-  }
-
-  if (vis_engine_.enable_global_mesh()) {
-    CollectAllBlocks(hash_table_, candidate_entries_);
-  } // else CollectBlocksInFrustum
-
-  int3 timing;
-  CompressMesh(candidate_entries_,
-               blocks_,
-               mesh_,
-               vis_engine_.compact_mesh(),
-               timing);
-
-  if (vis_engine_.enable_bounding_box()) {
-    vis_engine_.bounding_box().Reset();
-
-    ExtractBoundingBox(candidate_entries_,
-                       vis_engine_.bounding_box(),
-                       geometry_helper_);
-  }
-  if (vis_engine_.enable_trajectory()) {
-    vis_engine_.trajectory().AddPose(view.getInverse());
-  }
+//     ExtractBoundingBox(candidate_entries_,
+//                        vis_engine_.bounding_box(),
+//                        geometry_helper_);
+//   }
+//   if (vis_engine_.enable_trajectory()) {
+//     vis_engine_.trajectory().AddPose(view.getInverse());
+//     vis_engine_.trajectory().AddPose(view_gt.getInverse());
+//   }
 
 
-  if (vis_engine_.enable_ray_casting()) {
-    Timer timer;
-    timer.Tick();
-    vis_engine_.RenderRayCaster(view,
-                                blocks_,
-                                hash_table_,
-                                geometry_helper_);
-    LOG(INFO) << " Raycasting time: " << timer.Tock();
-  }
+//   if (vis_engine_.enable_ray_casting()) {
+//     Timer timer;
+//     timer.Tick();
+//     vis_engine_.RenderRayCaster(view,
+//                                 blocks_,
+//                                 hash_table_,
+//                                 geometry_helper_);
+//     LOG(INFO) << " Raycasting time: " << timer.Tock();
+//   }
 
-  return  vis_engine_.Render();
-}
+//   return  vis_engine_.Render();
+// }
 
-void MainEngine::Log() {
-  if (log_engine_.enable_video()) {
-    cv::Mat capture = vis_engine_.Capture();
-    log_engine_.WriteVideo(capture);
-  }
-}
+// int MainEngine::Visualize(float4x4 view) {
+//   if (vis_engine_.enable_interaction()) {
+//     vis_engine_.update_view_matrix();
+//   } else {
+//     // glm::mat4 glm_view;
+//     // for (int i = 0; i < 4; ++i)
+//     //   for (int j = 0; j < 4; ++j)
+//     //     glm_view[i][j] = view.entries2[i][j];
+//     // glm_view = glm::transpose(glm_view);
+//     // vis_engine_.set_view_matrix(glm_view);
+//   }
 
-void MainEngine::FinalLog() {
-  CollectAllBlocks(hash_table_, candidate_entries_);
-  Meshing();
-  int3 timing;
-  CompressMesh(candidate_entries_,
-               blocks_,
-               mesh_,
-               vis_engine_.compact_mesh(), timing);
-  if (log_engine_.enable_ply()) {
-    log_engine_.WritePly(vis_engine_.compact_mesh());
-  }
-  log_engine_.WriteMeshStats(vis_engine_.compact_mesh().vertex_count(),
-                             vis_engine_.compact_mesh().triangle_count());
-}
+//   if (vis_engine_.enable_global_mesh()) {
+//     CollectAllBlocks(hash_table_, candidate_entries_);
+//   } // else CollectBlocksInFrustum
+
+//   int3 timing;
+//   CompressMesh(candidate_entries_,
+//                blocks_,
+//                mesh_,
+//                vis_engine_.compact_mesh(),
+//                timing);
+
+//   if (vis_engine_.enable_bounding_box()) {
+//     vis_engine_.bounding_box().Reset();
+
+//     ExtractBoundingBox(candidate_entries_,
+//                        vis_engine_.bounding_box(),
+//                        geometry_helper_);
+//   }
+//   if (vis_engine_.enable_trajectory()) {
+//     vis_engine_.trajectory().AddPose(view.getInverse());
+//   }
+
+
+//   if (vis_engine_.enable_ray_casting()) {
+//     Timer timer;
+//     timer.Tick();
+//     vis_engine_.RenderRayCaster(view,
+//                                 blocks_,
+//                                 hash_table_,
+//                                 geometry_helper_);
+//     LOG(INFO) << " Raycasting time: " << timer.Tock();
+//   }
+
+//   return  vis_engine_.Render();
+// }
+
+// void MainEngine::Log() {
+//   if (log_engine_.enable_video()) {
+//     cv::Mat capture = vis_engine_.Capture();
+//     log_engine_.WriteVideo(capture);
+//   }
+// }
+
+// void MainEngine::FinalLog() {
+//   CollectAllBlocks(hash_table_, candidate_entries_);
+//   Meshing();
+//   int3 timing;
+//   CompressMesh(candidate_entries_,
+//                blocks_,
+//                mesh_,
+//                vis_engine_.compact_mesh(), timing);
+//   if (log_engine_.enable_ply()) {
+//     log_engine_.WritePly(vis_engine_.compact_mesh());
+//   }
+//   log_engine_.WriteMeshStats(vis_engine_.compact_mesh().vertex_count(),
+//                              vis_engine_.compact_mesh().triangle_count());
+// }
 
 /// Life cycle
 MainEngine::MainEngine(
@@ -362,41 +362,41 @@ void MainEngine::ConfigMappingEngine(
                    enable_bayesian_update);
 }
 
-void MainEngine::ConfigVisualizingEngine(
-    gl::Lighting &light,
-    bool enable_navigation,
-    bool enable_global_mesh,
-    bool enable_bounding_box,
-    bool enable_trajectory,
-    bool enable_polygon_mode,
-    bool enable_ray_caster,
-    bool enable_color
-) {
-  vis_engine_.Init("VisEngine", 640, 480);
-  vis_engine_.set_interaction_mode(enable_navigation);
-  vis_engine_.set_light(light);
-  vis_engine_.BindMainProgram(mesh_params_.max_vertex_count,
-                              mesh_params_.max_triangle_count,
-                              enable_global_mesh,
-                              enable_polygon_mode,
-                              enable_color);
-  vis_engine_.compact_mesh().Resize(mesh_params_);
+// void MainEngine::ConfigVisualizingEngine(
+//     gl::Lighting &light,
+//     bool enable_navigation,
+//     bool enable_global_mesh,
+//     bool enable_bounding_box,
+//     bool enable_trajectory,
+//     bool enable_polygon_mode,
+//     bool enable_ray_caster,
+//     bool enable_color
+// ) {
+//   vis_engine_.Init("VisEngine", 640, 480);
+//   vis_engine_.set_interaction_mode(enable_navigation);
+//   vis_engine_.set_light(light);
+//   vis_engine_.BindMainProgram(mesh_params_.max_vertex_count,
+//                               mesh_params_.max_triangle_count,
+//                               enable_global_mesh,
+//                               enable_polygon_mode,
+//                               enable_color);
+//   vis_engine_.compact_mesh().Resize(mesh_params_);
 
-  if (enable_bounding_box || enable_trajectory) {
-    vis_engine_.BuildHelperProgram();
-  }
+//   if (enable_bounding_box || enable_trajectory) {
+//     vis_engine_.BuildHelperProgram();
+//   }
 
-  if (enable_bounding_box) {
-    vis_engine_.InitBoundingBoxData(hash_params_.value_capacity*24);
-  }
-  if (enable_trajectory) {
-    vis_engine_.InitTrajectoryData(80000);
-  }
+//   if (enable_bounding_box) {
+//     vis_engine_.InitBoundingBoxData(hash_params_.value_capacity*24);
+//   }
+//   if (enable_trajectory) {
+//     vis_engine_.InitTrajectoryData(80000);
+//   }
 
-  if (enable_ray_caster) {
-    vis_engine_.BuildRayCaster(ray_caster_params_);
-  }
-}
+//   if (enable_ray_caster) {
+//     vis_engine_.BuildRayCaster(ray_caster_params_);
+//   }
+// }
 
 void MainEngine::ConfigLoggingEngine(
     std::string path,

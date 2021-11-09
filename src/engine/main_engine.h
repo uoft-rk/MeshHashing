@@ -37,16 +37,16 @@ public:
   );
 
   void ConfigLocalizingEngine();
-  void ConfigVisualizingEngine(
-      gl::Lighting& light,
-      bool enable_navigation,
-      bool enable_global_mesh,
-      bool enable_bounding_box,
-      bool enable_trajectory,
-      bool enable_polygon_mode,
-      bool enable_ray_caster,
-      bool enable_color
-  );
+  // void ConfigVisualizingEngine(
+  //     gl::Lighting& light,
+  //     bool enable_navigation,
+  //     bool enable_global_mesh,
+  //     bool enable_bounding_box,
+  //     bool enable_trajectory,
+  //     bool enable_polygon_mode,
+  //     bool enable_ray_caster,
+  //     bool enable_color
+  // );
 
   void ConfigLoggingEngine(
       std::string path,
@@ -58,8 +58,8 @@ public:
   void Mapping(Sensor &sensor);
   void Meshing();
   void Recycle();
-  int Visualize(float4x4 view);
-  int Visualize(float4x4 view, float4x4 view_gt);
+  // int Visualize(float4x4 view);
+  // int Visualize(float4x4 view, float4x4 view_gt);
 
   void Log();
   void RecordBlocks(std::string prefix = "");
@@ -75,7 +75,7 @@ public:
 private:
   // Engines
   MappingEngine     map_engine_;
-  VisualizingEngine vis_engine_;
+  // VisualizingEngine vis_engine_;
   LoggingEngine     log_engine_;
 
   // Core
