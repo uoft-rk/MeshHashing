@@ -42,7 +42,8 @@ void PredictOutlierRatioKernel(
     SensorParams sensor_params,
     float4x4 cTw,
     HashTable hash_table,
-    GeometryHelper geometry_helper) {
+    GeometryHelper geometry_helper,
+    int X) {
 
   const HashEntry &entry = candidate_entries[blockIdx.x];
   int3 voxel_base_pos = geometry_helper.BlockToVoxel(entry.pos);
@@ -65,7 +66,8 @@ void PredictOutlierRatioKernel(
   int image_idx = image_pos.x + image_pos.y * sensor_params.width;
 
   /// 3. Find correspondent depth observation
-  float depth = tex2D<float>(sensor_data.depth_texture, image_pos.x, image_pos.y);
+  // float depth = tex2D<float>(sensor_data.depth_texture, image_pos.x, image_pos.y);
+  float depth = sensor_data.depth_data[image_pos.y * X + image_pos.x];
   if (depth == MINF || depth == 0.0f || depth >= geometry_helper.sdf_upper_bound)
     return;
 
@@ -108,7 +110,8 @@ void UpdateBlocksBayesianKernel(
     SensorParams sensor_params,
     float4x4 cTw,
     HashTable hash_table,
-    GeometryHelper geometry_helper) {
+    GeometryHelper geometry_helper,
+    int X) {
 
   //TODO check if we should load this in shared memory (entries)
   /// 1. Select voxel
@@ -130,7 +133,8 @@ void UpdateBlocksBayesianKernel(
     return;
 
   /// 3. Find correspondent depth observation
-  float depth = tex2D<float>(sensor_data.depth_texture, image_pos.x, image_pos.y);
+  // float depth = tex2D<float>(sensor_data.depth_texture, image_pos.x, image_pos.y);
+  float depth = sensor_data.depth_data[image_pos.y * X + image_pos.x];
   if (depth == MINF || depth == 0.0f || depth >= geometry_helper.sdf_upper_bound)
     return;
   int image_idx = image_pos.x + image_pos.y * sensor_params.width;
@@ -197,7 +201,8 @@ void BuildSensorDataEquationKernel(
     float4x4 cTw,
     HashTable hash_table,
     GeometryHelper geometry_helper,
-    SensorLinearEquations linear_equations
+    SensorLinearEquations linear_equations,
+    int X
 ) {
   //TODO check if we should load this in shared memory (entries)
   /// 1. Select voxel
@@ -220,7 +225,8 @@ void BuildSensorDataEquationKernel(
     return;
 
   /// 3. Find correspondent depth observation
-  float depth = tex2D<float>(sensor_data.depth_texture, image_pos.x, image_pos.y);
+  // float depth = tex2D<float>(sensor_data.depth_texture, image_pos.x, image_pos.y);
+  float depth = sensor_data.depth_data[image_pos.y * X + image_pos.x];
   if (depth == MINF || depth == 0.0f || depth >= geometry_helper.sdf_upper_bound)
     return;
   float sdf = depth - camera_pos.z;
@@ -287,7 +293,8 @@ float PredictOutlierRatio(
           sensor.sensor_params(),
           sensor.cTw(),
           hash_table,
-          geometry_helper);
+          geometry_helper,
+          sensor.width());
   checkCudaErrors(cudaDeviceSynchronize());
   checkCudaErrors(cudaGetLastError());
 
@@ -319,7 +326,8 @@ float UpdateBlocksBayesian(
           sensor.sensor_params(),
           sensor.cTw(),
           hash_table,
-          geometry_helper);
+          geometry_helper,
+          sensor.width());
   checkCudaErrors(cudaDeviceSynchronize());
   checkCudaErrors(cudaGetLastError());
   return timer.Tock();
@@ -351,7 +359,8 @@ void BuildSensorDataEquation(
           sensor.cTw(),
           hash_table,
           geometry_helper,
-          linear_equations);
+          linear_equations,
+          sensor.width());
   checkCudaErrors(cudaDeviceSynchronize());
   checkCudaErrors(cudaGetLastError());
 }

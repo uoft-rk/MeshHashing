@@ -12,13 +12,15 @@ void SolveSensorDataEquationKernel(
     const SensorData sensor_data,
     const SensorParams params,
     float4x4 wTc,
-    GeometryHelper geometry_helper
+    GeometryHelper geometry_helper,
+    int X
 ) {
   const int x = blockIdx.x * blockDim.x + threadIdx.x;
   const int y = blockIdx.y * blockDim.y + threadIdx.y;
 
   const int idx = y * params.width + x;
-  float depth = tex2D<float>(sensor_data.depth_texture, x, y);
+  // float depth = tex2D<float>(sensor_data.depth_texture, x, y);
+  float depth = sensor_data.depth_data[y * X + x];
   if (depth == MINF || depth == 0.0f || depth > geometry_helper.sdf_upper_bound)
     return;
 
@@ -66,7 +68,8 @@ void SolveSensorDataEquation(
           data,
           params,
           sensor.wTc(),
-          geometry_helper);
+          geometry_helper,
+          sensor.width());
 }
 
 void SensorLinearEquations::Alloc(int width, int height) {

@@ -18,7 +18,8 @@ void UpdateBlocksSimpleKernel(
     SensorParams sensor_params,
     float4x4 cTw,
     HashTable hash_table,
-    GeometryHelper geometry_helper
+    GeometryHelper geometry_helper,
+    int X
 ) {
 
   //TODO check if we should load this in shared memory (entries)
@@ -41,7 +42,8 @@ void UpdateBlocksSimpleKernel(
     return;
 
   /// 3. Find correspondent depth observation
-  float depth = tex2D<float>(sensor_data.depth_texture, image_pos.x, image_pos.y);
+  // float depth = tex2D<float>(sensor_data.depth_texture, image_pos.x, image_pos.y);
+  float depth = sensor_data.depth_data[image_pos.y * X + image_pos.x];
   if (depth == MINF || depth == 0.0f || depth >= geometry_helper.sdf_upper_bound)
     return;
 
@@ -68,7 +70,8 @@ void UpdateBlocksSimpleKernel(
   delta.inv_sigma2 = inv_sigma2;
 
   if (sensor_data.color_data) {
-    float4 color = tex2D<float4>(sensor_data.color_texture, image_pos.x, image_pos.y);
+    // float4 color = tex2D<float4>(sensor_data.color_texture, image_pos.x, image_pos.y);
+    float4 color = sensor_data.color_data[image_pos.y * X + image_pos.x];
     delta.color = make_uchar3(255 * color.x, 255 * color.y, 255 * color.z);
   } else {
     delta.color = make_uchar3(0, 255, 0);
@@ -101,7 +104,8 @@ double UpdateBlocksSimple(
           sensor.sensor_params(),
           sensor.cTw(),
           hash_table,
-          geometry_helper);
+          geometry_helper,
+          sensor.width());
   checkCudaErrors(cudaDeviceSynchronize());
   checkCudaErrors(cudaGetLastError());
   return timer.Tock();

@@ -10,7 +10,8 @@ void AllocBlockArrayKernel(HashTable   hash_table,
                            SensorData  sensor_data,
                            SensorParams sensor_params,
                            float4x4     w_T_c,
-                           GeometryHelper geometry_helper) {
+                           GeometryHelper geometry_helper,
+                           int X) {
 
   const uint x = blockIdx.x * blockDim.x + threadIdx.x;
   const uint y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -20,7 +21,8 @@ void AllocBlockArrayKernel(HashTable   hash_table,
 
   /// TODO(wei): change it here
   /// 1. Get observed data
-  float depth = tex2D<float>(sensor_data.depth_texture, x, y);
+  // float depth = tex2D<float>(sensor_data.depth_texture, x, y);
+  float depth = sensor_data.depth_data[y * X + x];
   if (depth == MINF || depth == 0.0f
       || depth >= geometry_helper.sdf_upper_bound)
     return;
@@ -118,7 +120,8 @@ double AllocBlockArray(
       hash_table,
       sensor.data(),
       sensor.sensor_params(), sensor.wTc(),
-      geometry_helper);
+      geometry_helper,
+      sensor.width());
   checkCudaErrors(cudaDeviceSynchronize());
   checkCudaErrors(cudaGetLastError());
   return timer.Tock();

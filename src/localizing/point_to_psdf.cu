@@ -27,7 +27,8 @@ void PointToSurfaceKernel(
     mat6x6 *A,
     mat6x1 *b,
     float *err,
-    int *count
+    int *count,
+    int X
 ) {
   const int x = blockIdx.x * blockDim.x + threadIdx.x;
   const int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -37,7 +38,8 @@ void PointToSurfaceKernel(
   if (x % 2 == 0 || y % 2 == 0)
     return;
 
-  float depth = tex2D<float>(sensor_data.depth_texture, x, y);
+  // float depth = tex2D<float>(sensor_data.depth_texture, x, y);
+  float depth = sensor_data.depth_data[y * X + x];
   if (depth == MINF || depth == 0.0f
       || depth >= geometry_helper.sdf_upper_bound)
     return;
@@ -129,7 +131,8 @@ float PointToSurface(BlockArray &blocks,
           A,
           b,
           err,
-          count
+          count,
+          sensor.width()
   );
   checkCudaErrors(cudaDeviceSynchronize());
   checkCudaErrors(cudaGetLastError());
