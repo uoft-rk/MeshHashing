@@ -38,12 +38,32 @@ inline Voxel &GetVoxelRef(
     uint i = geometry_helper.VectorizeOffset(offset);
     return blocks[curr_entry.ptr].voxels[i];
   } else {
-    HashEntry entry = hash_table.GetEntry(block_pos);
-    if (entry.ptr == FREE_ENTRY) {
+    int entry_ptr = 0;
+#ifdef __CUDA_ARCH__
+    asm volatile("mad24.lo.s32 %0, %1, %2, %3;"
+                : "=r"(entry_ptr)
+                : "r"(block_pos.x),
+                  "r"(block_pos.y),
+                  "r"(block_pos.z));
+
+    bool cache_miss;
+    if (cache_miss = (entry_ptr == 0))
+#endif
+      entry_ptr = hash_table.GetEntry(block_pos).ptr;
+#ifdef __CUDA_ARCH__
+    if (cache_miss)
+      asm volatile("bfi.b32 %0, %1, %2, %3, %4;"
+                  : "=r"(entry_ptr)
+                  : "r"(block_pos.x),
+                    "r"(block_pos.y),
+                    "r"(block_pos.z),
+                    "r"(entry_ptr));
+#endif
+    if (entry_ptr == FREE_ENTRY) {
       printf("GetVoxelRef: should never reach here!\n");
     }
     uint i = geometry_helper.VectorizeOffset(offset);
-    return blocks[entry.ptr].voxels[i];
+    return blocks[entry_ptr].voxels[i];
   }
 }
 
@@ -62,12 +82,32 @@ inline MeshUnit &GetMeshUnitRef(
     uint i = geometry_helper.VectorizeOffset(offset);
     return blocks[curr_entry.ptr].mesh_units[i];
   } else {
-    HashEntry entry = hash_table.GetEntry(block_pos);
-    if (entry.ptr == FREE_ENTRY) {
+    int entry_ptr = 0;
+#ifdef __CUDA_ARCH__
+    asm volatile("mad24.lo.s32 %0, %1, %2, %3;"
+                : "=r"(entry_ptr)
+                : "r"(block_pos.x),
+                  "r"(block_pos.y),
+                  "r"(block_pos.z));
+
+    bool cache_miss;
+    if (cache_miss = (entry_ptr == 0))
+#endif
+      entry_ptr = hash_table.GetEntry(block_pos).ptr;
+#ifdef __CUDA_ARCH__
+    if (cache_miss)
+      asm volatile("bfi.b32 %0, %1, %2, %3, %4;"
+                  : "=r"(entry_ptr)
+                  : "r"(block_pos.x),
+                    "r"(block_pos.y),
+                    "r"(block_pos.z),
+                    "r"(entry_ptr));
+#endif
+    if (entry_ptr == FREE_ENTRY) {
       printf("GetVoxelRef: should never reach here!\n");
     }
     uint i = geometry_helper.VectorizeOffset(offset);
-    return blocks[entry.ptr].mesh_units[i];
+    return blocks[entry_ptr].mesh_units[i];
   }
 }
 
@@ -144,22 +184,12 @@ inline bool GetVoxelValue(
 #endif
     entry_ptr = hash_table.GetEntry(block_pos).ptr;
 
+  bool ret_val;
   if (entry_ptr == FREE_ENTRY) {
     voxel->sdf = 0;
     voxel->inv_sigma2 = 0;
     voxel->color = make_uchar3(0,0,0);
-
-#ifdef __CUDA_ARCH__
-  if (cache_miss)
-    asm volatile("bfi.b32 %0, %1, %2, %3, %4;"
-                 : "=r"(entry_ptr)
-                 : "r"(block_pos.x),
-                   "r"(block_pos.y),
-                   "r"(block_pos.z),
-                   "r"(entry_ptr));
-#endif
-
-    return false;
+    ret_val = false;
   } else {
     uint i = geometry_helper.VectorizeOffset(offset);
     const Voxel& v = blocks[entry_ptr].voxels[i];
@@ -168,6 +198,8 @@ inline bool GetVoxelValue(
     voxel->color = v.color;
     voxel->a = v.a;
     voxel->b = v.b;
+    ret_val = true;
+  }
 
 #ifdef __CUDA_ARCH__
   if (cache_miss)
@@ -179,8 +211,7 @@ inline bool GetVoxelValue(
                    "r"(entry_ptr));
 #endif
 
-    return true;
-  }
+  return ret_val;
 }
 
 #endif //MESH_HASHING_SPATIAL_QUERY_H
